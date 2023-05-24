@@ -19,5 +19,5 @@ Modify the ping.py program so that it will execute the watchdog.py program as we
 *It is required that the code will work on localhost on both ping.py and watchdog.py.
 *In part b you will handout better_ping.py and watchdog.py
 
-  ### run with "python def_better_ping.py" 
+  ### run with "sudo python3 better_ping.py" 
 
