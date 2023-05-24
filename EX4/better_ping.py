@@ -1,3 +1,5 @@
+
+
 import os
 import socket
 import struct
@@ -67,7 +69,6 @@ def one_send_recv_ping(host):
             print(f"Socket error recived failed: {e}")
             # If no replay was recieved  
             return 0
-        
 
         # Extract the ICMP type and code from the response packet
         icmp_type, icmp_code = struct.unpack('!BB', data[20:22])
@@ -110,19 +111,16 @@ def checksum(data):
     return checksum
 
 if __name__ == '__main__':
-    
     host = '8.8.8.8'
     # start the watchdog server on different thread.
     t_watchdog = threading.Thread(target=lambda: os.system(f'python3 watch_dog.py'))
     t_watchdog.start()
-    
     time.sleep(1)
     try:
         # we send&recive untill keyboard interupted or timeout error:
         while True:
             # one_send_recv_ping - return 1 if the send sucsess and got replay 
             is_sent = one_send_recv_ping(host)
-            
             # After the ping sucsess
             # Create the socket to connect and identify watchdog
             sock2 = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
@@ -135,7 +133,6 @@ if __name__ == '__main__':
                 print("socket connected successfully\n")
             else:
                 print(f"Socket connect failed")
-            
             if (is_sent == 1):
                 # Identify the watch dog that response was recived
                 message = "got responed"
