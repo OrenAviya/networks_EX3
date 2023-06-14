@@ -1,7 +1,8 @@
 from scapy.all import *
 from scapy.layers.inet import IP, TCP, ICMP, UDP
 
-
+#the checksum is needed when we don't use raw socket.
+#but we foumd that just in our reserch after we use it. so it still here in code.
 def cal_checksum(data):
     # Calculate the checksum of the data
     checksum = 0
@@ -20,13 +21,14 @@ def cal_checksum(data):
 
     return checksum
 
-
+#definding source and destination ip and port:
 source_ip = '1.2.3.4'
 dest_ip = "8.8.8.8"
 source_port = 5000
 dest_port = 12345
 
-
+# the function spoof_ip is responsible for sending the fake packet
+# we use raw socket for all the three types of packets
 def spoof_ip(fake_packet , type) :  # packet type is ICMP / TCP / UDP
 
     if type == "ICMP":
@@ -34,36 +36,19 @@ def spoof_ip(fake_packet , type) :  # packet type is ICMP / TCP / UDP
         sock = socket.socket(socket.AF_INET, socket.SOCK_RAW, socket.IPPROTO_RAW)
 
     if type == "UDP":
-        # Create a UDP socket
-        #sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
         sock = socket.socket(socket.AF_INET, socket.SOCK_RAW, socket.IPPROTO_RAW)
 
     if type == "TCP":
-        #sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         sock = socket.socket(socket.AF_INET, socket.SOCK_RAW, socket.IPPROTO_RAW)
 
     scapy_packet = IP(fake_packet)
 
     # Send the modified packet
-    # sock.sendto((packet), ('localhost', 0))
+
     send(scapy_packet, verbose=False)
     sock.close()
 
-
-def spoof_ip0(fake_packet):  # packet type is ICMP / TCP / UDP
-    # create a raw socket:
-    sock = socket.socket(socket.AF_INET, socket.SOCK_RAW, socket.IPPROTO_RAW)
-    # Create a UDP socket
-    # sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
-
-    scapy_packet = IP(fake_packet)
-
-    # Send the modified packet
-    sock.sendto(fake_packet, (dest_ip, 0))
-    # sock.sendto(packet, (packet[], 0))
-    sock.close()
-
-
+## the three functions below are responsible for creating the fake packets
 def create_TCP_spoof_packet():
     data = b'fake TCP'
     ip_header = struct.pack('!BBHHHBBH4s4s', 69, 0, 28 + len(data), 0, 21, socket.IPPROTO_TCP,
@@ -171,13 +156,3 @@ if __name__ == "__main__":
     else:
         print("this is not a legal option")
 
-#tcp_packet = create_TCP_spoof_packet()
-#udp_packet = create_UDP_spoof_packet()
-#icmp_packet = create_icmp_spoof_packet()
-
-#spoof_ip(udp_packet)
-#print("spoof udp")
-# spoof_ip(tcp_packet)
-# print("spoof tcp")
-# spoof_ip(icmp_packet)
-# print("spoof icmp")
