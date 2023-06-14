@@ -21,28 +21,53 @@ def cal_checksum(data):
     return checksum
 
 
-def spoof_ip(packet):  # packet type is ICMP / TCP / UDP
+source_ip = '1.2.3.4'
+dest_ip = "8.8.8.8"
+source_port = 5000
+dest_port = 12345
+
+
+def spoof_ip(fake_packet , type) :  # packet type is ICMP / TCP / UDP
+
+    if type == "ICMP":
+        # create a raw socket:
+        sock = socket.socket(socket.AF_INET, socket.SOCK_RAW, socket.IPPROTO_RAW)
+
+    if type == "UDP":
+        # Create a UDP socket
+        #sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+        sock = socket.socket(socket.AF_INET, socket.SOCK_RAW, socket.IPPROTO_RAW)
+
+    if type == "TCP":
+        #sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        sock = socket.socket(socket.AF_INET, socket.SOCK_RAW, socket.IPPROTO_RAW)
+
+    scapy_packet = IP(fake_packet)
+
+    # Send the modified packet
+    # sock.sendto((packet), ('localhost', 0))
+    send(scapy_packet, verbose=False)
+    sock.close()
+
+
+def spoof_ip0(fake_packet):  # packet type is ICMP / TCP / UDP
     # create a raw socket:
     sock = socket.socket(socket.AF_INET, socket.SOCK_RAW, socket.IPPROTO_RAW)
     # Create a UDP socket
-    #sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+    # sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
 
-    scapy_packet = IP(packet)
+    scapy_packet = IP(fake_packet)
 
     # Send the modified packet
-    sock.sendto((packet), ('localhost', 0))
-    #sock.sendto(packet, (packet[], 0))
+    sock.sendto(fake_packet, (dest_ip, 0))
+    # sock.sendto(packet, (packet[], 0))
     sock.close()
 
 
 def create_TCP_spoof_packet():
-    source_ip = '1.2.3.4'
-    dest_ip = "127.0.0.1"
-    source_port =5000
-    dest_port =12345
     data = b'fake TCP'
     ip_header = struct.pack('!BBHHHBBH4s4s', 69, 0, 28 + len(data), 0, 21, socket.IPPROTO_TCP,
-                     0, socket.htons(0), socket.inet_aton(source_ip), socket.inet_aton(dest_ip))
+                            0, socket.htons(0), socket.inet_aton(source_ip), socket.inet_aton(dest_ip))
 
     tcp_header = struct.pack('!HHLLBBHHH',
                              source_port,
@@ -79,28 +104,24 @@ def create_TCP_spoof_packet():
 
 
 def create_UDP_spoof_packet():
-    data= b'fake UDP'
-    source_ip = '1.2.3.4'
-    dest_ip = "127.0.0.1"
-    source_port = 5000
-    dest_port= 12345
+    data = b'fake UDP'
+
     udp_header = struct.pack('!HHHH',
                              source_port,
                              dest_port,
                              8 + len(data),  # Length of UDP header + data
                              0)  # Placeholder for checksum calculation
     ip_header = struct.pack('!BBHHHBBH4s4s', 69, 0, 28 + len(data), 0, 21, socket.IPPROTO_UDP,
-                0, socket.htons(0), socket.inet_aton(source_ip), socket.inet_aton(dest_ip))
+                            0, socket.htons(0), socket.inet_aton(source_ip), socket.inet_aton(dest_ip))
 
-
-    udp_packet = ip_header+ udp_header + data
+    udp_packet = ip_header + udp_header + data
     return udp_packet
 
 
 def create_icmp_spoof_packet():
     # Create the IP header
     ip_header = struct.pack('!BBHHHBBH4s4s', 69, 0, 28, 0, 21, socket.IPPROTO_ICMP, 0, socket.htons(0),
-                            socket.inet_aton("1.2.3.4"), socket.inet_aton("127.0.0.1"))
+                            socket.inet_aton("1.2.3.4"), socket.inet_aton("10.0.2.15"))
 
     # Create the ICMP header and data
     icmp_type = 8  # ICMP Echo Request type
@@ -132,13 +153,31 @@ def create_icmp_spoof_packet():
     return icmp_packet  # packet
 
 
-tcp_packet = create_TCP_spoof_packet()
-udp_packet = create_UDP_spoof_packet()
-icmp_packet = create_icmp_spoof_packet()
+if __name__ == "__main__":
+    type_protocol = input("please choose and write one protocol: TCP / UDP / ICMP: ")
+
+    if type_protocol == "TCP":
+        tcp_packet = create_TCP_spoof_packet()
+        spoof_ip(tcp_packet, "TCP")
+        print("spoof tcp")
+    elif type_protocol == "UDP":
+        udp_packet = create_UDP_spoof_packet()
+        spoof_ip(udp_packet, "UDP")
+        print("spoof udp")
+    elif type_protocol == "ICMP":
+        icmp_packet = create_icmp_spoof_packet()
+        spoof_ip(icmp_packet, "ICMP")
+        print("spoof icmp")
+    else:
+        print("this is not a legal option")
+
+#tcp_packet = create_TCP_spoof_packet()
+#udp_packet = create_UDP_spoof_packet()
+#icmp_packet = create_icmp_spoof_packet()
 
 #spoof_ip(udp_packet)
 #print("spoof udp")
-#spoof_ip(tcp_packet)
-#print("spoof tcp")
-spoof_ip(icmp_packet)
-print("spoof icmp")
+# spoof_ip(tcp_packet)
+# print("spoof tcp")
+# spoof_ip(icmp_packet)
+# print("spoof icmp")
