@@ -1,5 +1,5 @@
 
-##Task A – 15%
+## Task A – 15%
 Write your own sniffer for capturing packets.  Your sniffer should be able to sniff the following protocols:
 -	TCP
 -	UDP 
@@ -13,7 +13,8 @@ Question
 -	Why do you need the root privilege to run a sniffer program? Where does the program fail if it is executed without the root privilege? 
 Submission – sniffer.py and relative pcap file
 Write detailed research in your PDF about Your sniffer abilities and limitations
-##Task B – 15%
+
+## Task B – 15%
 Write a spoofer for spoofing packets. Your spoofer should be able to spoof packets  by using the following protocols:
 -	ICMP
 -	UDP
@@ -27,12 +28,12 @@ Question 2.
 Using the raw socket programming, do you have to calculate the checksum for the IP header?
 Write detailed research in your PDF about Your spoofer abilities and limitations
 
-##Task C – 10%
+## Task C – 10%
 The objective of this task is to use Scapy to estimate the distance, in terms of number of routers, between your VM and a selected destination. This is basically what is implemented by the traceroute tool. In this task, we will write our own tool. The idea is quite straightforward: just send an packet (any type) to the destination, with its Time-To-Live (TTL) field set to 1 first. This packet will be dropped by the first router, which will send us an ICMP error message, telling us that the time-to-live has exceeded. That is how we get the IP address of the first router. We then increase our TTL field to 2, send out another packet, and get the IP address of the second router. We will repeat this procedure until our packet finally reach the destination. It should be noted that this experiment only gets an estimated result, because in theory, not all these packets take the same route (but in practice, they may within a short period of time).
 
 * You should write your tool to perform the entire procedure automatically.
 
-##Task D – 50%
+## Task D – 50%
 @Before -read Appendix B for composing the LAN of docker containers.
 In this task, you will combine the sniffing and spoofing techniques to implement the following sniff-and-then-spoof program. You need two machines on the same LAN. From machine A, you ping an IP X. This will generate an ICMP echo request packet. If X is alive, the ping program will receive an echo reply, and print out the response. Your sniff-and-then-spoof program runs on the attacker machine, which monitors the LAN through packet sniffing. Whenever it sees an ICMP echo request, regardless of what the target IP address is, your program should immediately send out an echo reply using the packet spoofing technique. 
 Please follow those steps:
@@ -44,7 +45,7 @@ b.	Second run – send a ping from Host A to a WAN IP (e.g., google DNS – 8.8.
 c.	Third run – send a ping from Host A to a fake IP.
 d.	Fourth run – send a ping from Host A to fake IP in your LAN
 3.	Write detailed research in your PDF about Task C
-##Task E - 10%
+## Task E - 10%
 Please show how you can use your sniffer program to capture the password when somebody is using telnet on the network that you are monitoring. You may need to modify your sniffer code to print out the data part of a captured TCP packet (telnet uses TCP). It is acceptable if you print out the entire data part, and then manually mark where the password (or part of it) is.
 
 Submission – sniffing_passwords.py and relative pcap file
